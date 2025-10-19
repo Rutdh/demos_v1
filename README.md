@@ -5,7 +5,7 @@
 构建命令, 以gtest生成静态/动态, debug/release组合共计4个版本的库为例子, 如下:  
 ``` cmake
 # 静态 Debug
-cmake -S thirdparty/googletest -B build/gtest-static-debug \
+cmake -S thirdparty/googletest -B build/gtest-static-debug -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
@@ -13,7 +13,7 @@ cmake --build build/gtest-static-debug
 cmake --install build/gtest-static-debug --prefix lib/gtest/static-debug
 
 # 静态 Release
-cmake -S thirdparty/googletest -B build/gtest-static-release \
+cmake -S thirdparty/googletest -B build/gtest-static-release -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
@@ -21,7 +21,7 @@ cmake --build build/gtest-static-release
 cmake --install build/gtest-static-release --prefix lib/gtest/static-release
 
 # 动态 Debug
-cmake -S thirdparty/googletest -B build/gtest-shared-debug \
+cmake -S thirdparty/googletest -B build/gtest-shared-debug -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
@@ -29,7 +29,7 @@ cmake --build build/gtest-shared-debug
 cmake --install build/gtest-shared-debug --prefix lib/gtest/shared-debug
 
 # 动态 Release
-cmake -S thirdparty/googletest -B build/gtest-shared-release \
+cmake -S thirdparty/googletest -B build/gtest-shared-release -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
