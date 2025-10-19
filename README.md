@@ -3,6 +3,7 @@
 三方库作为一个项目, 自然也受到了此约定的束缚, 但是和一般个人项目不同, 三方库要供给demos_v1下面的多个子项目使用,  
 因此, 三方库会生成多个不同版本的库, 生成的库和头文件打包放在顶层目录的lib下面.  
 构建命令, 以gtest生成静态/动态, debug/release组合共计4个版本的库为例子, 如下:  
+(generator是ninja, 编译器为clang)  
 ``` cmake
 # 静态 Debug
 cmake -S thirdparty/googletest -B build/gtest-static-debug -G Ninja \
