@@ -7,3 +7,6 @@
 [submodule "thirdparty/glog"]
 	path = thirdparty/glog
 	url = https://github.com/google/glog.git
+[submodule "plugin_manager"]
+	path = plugin_manager
+	url = https://github.com/Rutdh/plugin_manager.git
