@@ -1,0 +1,6 @@
+{
+  "cmake.configureOnOpen": false,
+  "cmake.clearOutputBeforeBuild": false,
+  "cmake.buildBeforeRun": false,
+  "cmake.configureOnEdit": false
+}
