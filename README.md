@@ -64,3 +64,30 @@ git submodule init && git submodule update
 
 等全部关掉，只保留语法高亮；它仍提供语言补全，但不会触发自动配置/扫描
 
+### clangd怎么找到合适的compile_commands.json
+现在因为通过CMakePresets.json搞出来了各种配置的构建, 所以会生成多份 compile_commands.json, 并且不是位于build层级目录里面,  
+所以clangd插件默认可能会找不到, 要在.clangd里面指定比那一数据库所在的目录:
+``` yaml
+CompileFlags:
+  CompilationDatabase: build/debug
+```
+目前的解决方案是搞一个compile.sh脚本, 这个脚本会在build层级目录下面创建一个指向当前活跃配置的compile_commands.json的软链接.
+
+### 编译脚本 compile.sh脚本
+主要用于封装编译命令, 让人手动执行的部分更少, 同时编译提示, 报错和输入信息量反而更多.  
+这个脚本和CMakePresets.json都在
+
+
+## 一个有趣的现象
+现在我的learn_cxx_by_projects项目来源是`南山烟雨珠江潮`的项目, 但是我并没有权限给它的仓库推送代码,  
+所以, learn_cxx_by_projects 推送到了我的github远程仓库上面, 那么日后如果要更新上游修改应该怎么做?  
+```
+cd learn_cxx_by_projects
+git remote add upstream <原开源项目地址>  # 只需一次
+git fetch upstream
+git checkout main                       # 或你正在同步的分支
+git merge upstream/main                 # 或 git rebase upstream/main
+git push origin main
+```
+
+
