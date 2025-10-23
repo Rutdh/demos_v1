@@ -7,3 +7,6 @@
 [submodule "thirdparty/glog"]
 	path = thirdparty/glog
 	url = https://github.com/google/glog.git
+[submodule "learn_cxx_by_projects"]
+	path = learn_cxx_by_projects
+	url = https://github.com/franktea/learn_cxx_by_projects.git
