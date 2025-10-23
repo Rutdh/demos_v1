@@ -46,7 +46,7 @@ git submodule add https://github.com/google/googletest.git thirdparty/googletest
 ```
 同步命令:
 ```
-git submodule init && git submodule update
+git submodule update --init --recursive
 ```
 
 ## 构建工具链--通过CMakePresets.json管理
