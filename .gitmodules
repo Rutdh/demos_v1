@@ -10,3 +10,6 @@
 [submodule "learn_cxx_by_projects"]
 	path = learn_cxx_by_projects
 	url = https://github.com/Rutdh/learn_cxx_by_projects.git
+[submodule "thirdparty/ftxui"]
+	path = thirdparty/ftxui
+	url = https://github.com/Rutdh/FTXUI.git
