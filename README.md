@@ -1,15 +1,21 @@
 ## 三方库
 在demos_v1中, 每个项目作为一个基本单位, 都会通过git进行管理, 因此, github就是唯一合适的远程代码托管平台.  
-三方库作为一个项目, 自然也受到了此约定的束缚, 但是和一般个人项目不同, 三方库要供给demos_v1下面的多个子项目使用,  
-因此, 三方库会生成多个不同版本的库, 生成的库和头文件打包放在顶层目录的lib下面.  
+三方库作为一个项目, 自然也受到了此约定的束缚, 但是和其他项目不同, 三方库还要供给demos_v1下面的多个子项目使用,  
+因此, 三方库会生成多个不同版本的库, 生成的库和头文件也要打包放在顶层目录的lib下面.  
 构建命令, 以gtest生成静态/动态, debug/release组合共计4个版本的库为例子, 如下:  
 (generator是ninja, 编译器为clang)  
+
+对于公共版本来说, 没必要生成 `compile_commands.json`, 用ninja是为了利用其多线程编译特性. 
+但是如果想阅读三方库的源码, 那么 `compile_commands.json` 就是必须的了,  
+所以还是在cmake的构建阶段加上`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` 这条命令吧  
+注意如果是研究源码使用的话, 尽量不install, 避免lib体积膨胀太快, 当然如果是定制版本, install也行
 ``` cmake
 # 静态 Debug
 cmake -S thirdparty/googletest -B build/gtest-static-debug -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build/gtest-static-debug
 cmake --install build/gtest-static-debug --prefix lib/gtest/static-debug
 
@@ -17,7 +23,8 @@ cmake --install build/gtest-static-debug --prefix lib/gtest/static-debug
 cmake -S thirdparty/googletest -B build/gtest-static-release -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build/gtest-static-release
 cmake --install build/gtest-static-release --prefix lib/gtest/static-release
 
@@ -25,7 +32,8 @@ cmake --install build/gtest-static-release --prefix lib/gtest/static-release
 cmake -S thirdparty/googletest -B build/gtest-shared-debug -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build/gtest-shared-debug
 cmake --install build/gtest-shared-debug --prefix lib/gtest/shared-debug
 
@@ -33,11 +41,15 @@ cmake --install build/gtest-shared-debug --prefix lib/gtest/shared-debug
 cmake -S thirdparty/googletest -B build/gtest-shared-release -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build/gtest-shared-release
 cmake --install build/gtest-shared-release --prefix lib/gtest/shared-release
-
 ```
+ 
+
+### 作为一个项目研究源码的版本
+而且这样会有很多
 
 ## git submodule
 添加子模块:
