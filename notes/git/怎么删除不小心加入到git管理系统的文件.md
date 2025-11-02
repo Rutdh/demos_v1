@@ -1,0 +1,1 @@
+以`ftxui_learing/hello_world/.cache/` 举例, 删除命令是git rm -r --cached ftxui_learing/hello_world/.cache/
