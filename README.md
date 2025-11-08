@@ -1,5 +1,5 @@
 ## 三方库
-在demos_v1中, 每个项目作为一个基本单位, 都会通过git进行管理, 因此, github就是唯一合适的远程代码托管平台.  
+在demos_v1中, 每个项目作为一个基本单位, 都会通过git进行管理[^1], 因此, github就是唯一合适的远程代码托管平台.  
 三方库作为一个项目, 自然也受到了此约定的束缚, 但是和其他项目不同, 三方库还要供给demos_v1下面的多个子项目使用,  
 因此, 三方库会生成多个不同版本的库, 生成的库和头文件也要打包放在顶层目录的lib下面.  
 构建命令, 以gtest生成静态/动态, debug/release组合共计4个版本的库为例子, 如下:  
@@ -46,7 +46,10 @@ cmake -S thirdparty/googletest -B build/gtest-shared-release -G Ninja \
 cmake --build build/gtest-shared-release
 cmake --install build/gtest-shared-release --prefix lib/gtest/shared-release
 ```
- 
+
+
+[^1]: 存在部分项目比如cpp_primer,ftxui_learning其实没有遵循这个规定
+
 
 ### 作为一个项目研究源码的版本
 而且这样会有很多

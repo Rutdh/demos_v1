@@ -13,3 +13,6 @@
 [submodule "thirdparty/ftxui"]
 	path = thirdparty/ftxui
 	url = https://github.com/Rutdh/FTXUI.git
+[submodule "tutorial/Modern-Cpp-templates"]
+	path = tutorial/Modern-Cpp-templates
+	url = https://github.com/Rutdh/Modern-Cpp-templates-tutorial.git
