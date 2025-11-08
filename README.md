@@ -60,6 +60,20 @@ git submodule add https://github.com/google/googletest.git thirdparty/googletest
 ```
 git submodule update --init --recursive
 ```
+注意上面的添加子模块命令里面, 目标路径要是不存在的, 不是空的而是不存在的, 并且git会在目标路径下面clone子模块的代码,  
+但是不会带上子模块名字, 所以目标路径最后一层应该是子模块名字或者其他合适的名字.  
+这点很容易踩坑, 所以记录一下怎么删除添加到错误路径的子模块的方法.
+``` txt
+普遍做法是把子模块从 .gitmodules、.git/config 和工作区里都清理掉，再提交一次变更即可。常见步骤如下（在仓库根目录）：
+
+git submodule deinit -f path/to/submodule：让 Git 忘记这个子模块的配置。
+rm -rf path/to/submodule：删除工作区里的子模块目录（只删你要移除的那一项）。
+编辑 .gitmodules，删除对应 [submodule "…"] 块；如果项目根的 .git/config 中也有该块，一并删掉。
+git add .gitmodules path/to/submodule（以及 .git/config 若被追踪）并提交：git commit -m "Remove mistaken submodule".
+如需彻底清理 .git/modules/path/to/submodule 缓存目录（通常在主仓库的 .git/modules 下），可执行 rm -rf .git/modules/path/to/submodule。
+
+之后重新用正确路径执行 git submodule add … new/path 即可。
+```
 
 ## 构建工具链--通过CMakePresets.json管理
 现在希望项目使用的工具链是clang++, Ninja, clangd, 并且构建目标要有多种配置(比如debug或者release)  
