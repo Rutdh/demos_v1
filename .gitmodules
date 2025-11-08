@@ -16,3 +16,6 @@
 [submodule "tutorial/Modern-Cpp-templates"]
 	path = tutorial/Modern-Cpp-templates
 	url = https://github.com/Rutdh/Modern-Cpp-templates-tutorial.git
+[submodule "git-tui"]
+	path = git-tui
+	url = https://github.com/Rutdh/git-tui.git
