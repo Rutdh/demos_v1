@@ -1,18 +1,23 @@
+#include "ftxui/component/component_options.hpp"
 #include <cctype>
+#include <cstddef>
 #include <functional>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 
+#include <glog/logging.h>
+
 using namespace ftxui;
 
 // ---------------------- Domain model ----------------------------------------
 class CalculatorModel {
- public:
+public:
   void Clear() {
     expression_.clear();
     result_ = "0";
@@ -37,38 +42,31 @@ class CalculatorModel {
     }
     if (expression_.empty() || IsOperator(expression_.back())) {
       expression_ += "0";
+      return;
     }
-    expression_.push_back('.');
+
+    expression_ += ".";
     error_.clear();
+    return;
   }
 
   void AppendOperator(char op) {
     if (expression_.empty()) {
-      // allow unary minus
+      // 为什么这里只允许-?
       if (op == '-') {
         expression_.push_back(op);
+        return;
       }
-      return;
     }
-    const char last = expression_.back();
-    if (IsOperator(last)) {
-      if (op == '-') {
-        const bool last_is_unary =
-            expression_.size() == 1 ||
-            IsOperator(expression_[expression_.size() - 2]);
-        if (!last_is_unary) {
-          // enable "--" so expressions like "5--2" are possible
-          expression_.push_back(op);
-        } else {
-          expression_.back() = op;
-        }
-      } else {
-        expression_.back() = op;
-      }
+
+    if (IsOperator(expression_.back())) {
+      expression_.back() = op;
     } else {
       expression_.push_back(op);
     }
+
     error_.clear();
+    return;
   }
 
   void Evaluate() {
@@ -80,34 +78,28 @@ class CalculatorModel {
 
     double value = 0.0;
     if (EvaluateExpression(expression_, value)) {
+      // 这里为什么要先输出到一个流里面
       std::ostringstream oss;
       oss << value;
       result_ = oss.str();
       error_.clear();
     } else {
-      error_ = "Invalid expression";
+      LOG(INFO) << "Invalid expression: " << expression_;
+      error_ = "Invalid expression.";
     }
   }
 
-  const std::string& expression() const { return expression_; }
-  const std::string& result() const { return result_; }
-  const std::string& error() const { return error_; }
+  const std::string& expression() const {return expression_;}
+  const std::string& result() const {return result_;}
+  const std::string& error() const {return error_;}
 
- private:
+private:
   static bool IsOperator(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/';
+    return (c == '+' || c == '-' || c == '*' || c == '/');
   }
 
-  bool CurrentNumberHasDot() const {
-    for (auto it = expression_.rbegin(); it != expression_.rend(); ++it) {
-      if (IsOperator(*it)) {
-        break;
-      }
-      if (*it == '.') {
-        return true;
-      }
-    }
-    return false;
+  bool CurrentNumberHasDot() {
+    return expression_.find('.') == std::string::npos ? false : true;
   }
 
   static bool EvaluateExpression(const std::string& expr, double& out) {
@@ -115,29 +107,41 @@ class CalculatorModel {
       return (op == '+' || op == '-') ? 1 : 2;
     };
 
-    auto apply = [](std::vector<double>& values, std::vector<char>& ops) {
+    auto apply = [](std::vector<double>& values, std::vector<char> &ops) {
       if (values.size() < 2 || ops.empty()) {
         return false;
       }
-      double b = values.back();
+
+      auto b = values.back();
       values.pop_back();
-      double a = values.back();
+      auto a = values.back();
       values.pop_back();
       char op = ops.back();
       ops.pop_back();
+      LOG(INFO) << "[apply]: a:" << a 
+        << " op: " << op
+        << " b:" << b << "applied";
 
       double res = 0.0;
       switch (op) {
-        case '+': res = a + b; break;
-        case '-': res = a - b; break;
-        case '*': res = a * b; break;
+        case '+': 
+          res = a + b;
+          break;
+        case '-':
+          res = a - b;
+          break;
+        case '*':
+          res = a * b;
+          break;
         case '/':
-          if (b == 0.0) {
+          if (b == 0) {
             return false;
+            break;
           }
           res = a / b;
           break;
-        default: return false;
+        default:
+          return false;
       }
       values.push_back(res);
       return true;
@@ -151,36 +155,43 @@ class CalculatorModel {
         continue;
       }
 
-      if (std::isdigit(expr[i]) || expr[i] == '.' ||
-          (expr[i] == '-' && (i == 0 || IsOperator(expr[i - 1])))) {
+      if (std::isdigit(expr[i]) || expr[i] == '.' 
+        || (expr[i] == '-' && (i == 0 || IsOperator(i - 1)))) {
         size_t start = i;
         bool has_dot = expr[i] == '.';
         ++i;
-        while (i < expr.size() &&
-               (std::isdigit(expr[i]) || (!has_dot && expr[i] == '.'))) {
-          if (expr[i] == '.') {
-            has_dot = true;
-          }
+
+        while (i < expr.size() && std::isdigit(expr[i]) || 
+          (!has_dot && expr[i] == '.')) {
+            if (expr[i] == '.') {
+              has_dot = true;
+            }
           ++i;
         }
+        
         double value = std::stod(expr.substr(start, i - start));
         values.push_back(value);
+        LOG(INFO) << "value: " << value << "push back to values";
         continue;
       }
 
+      LOG(INFO) << "IsOperator before: " << expr[i];
       if (IsOperator(expr[i])) {
         char op = expr[i];
-        while (!ops.empty() && precedence(ops.back()) >= precedence(op)) {
-          if (!apply(values, ops)) {
+        while (!ops.empty() && precedence(ops.back()) > precedence(op)) {
+          if (!apply(values, ops)) { 
+            LOG(INFO) << "apply calc failed.";
+            
             return false;
           }
         }
         ops.push_back(op);
+        LOG(INFO) << "op: " << op << "push back to ops";
         ++i;
         continue;
       }
 
-      return false;  // unsupported character
+      return false; // 不支持的情况
     }
 
     while (!ops.empty()) {
@@ -189,13 +200,14 @@ class CalculatorModel {
       }
     }
 
-    if (values.size() != 1) {
+    if (values.size() > 1) {
       return false;
     }
+
     out = values.back();
     return true;
   }
-
+private:
   std::string expression_;
   std::string result_ = "0";
   std::string error_;
@@ -203,24 +215,25 @@ class CalculatorModel {
 
 // ---------------------- Controller ------------------------------------------
 class CalculatorController {
- public:
+public:
   explicit CalculatorController(CalculatorModel model = {})
-      : model_(std::move(model)) {}
+    : model_(std::move(model)) {}
 
-  void OnChange(std::function<void()> cb) { on_change_ = std::move(cb); }
+  void OnChange(std::function<void()> cb) {
+    on_change_ = std::move(cb);
+  }
 
-  void Digit(char digit) { model_.AppendDigit(digit); Notify(); }
-  void Operator(char op) { model_.AppendOperator(op); Notify(); }
-  void Dot() { model_.AppendDot(); Notify(); }
-  void Clear() { model_.Clear(); Notify(); }
-  void Backspace() { model_.Backspace(); Notify(); }
-  void Equals() { model_.Evaluate(); Notify(); }
+  void Digit(char digit) {model_.AppendDigit(digit); Notify();}
+  void Operator(char op) {model_.AppendOperator(op);}
+  void Dot() {model_.AppendDot(); Notify();}
+  void Clear() {model_.Clear(); Notify();}
+  void Backspace() {model_.Backspace(); Notify();}
+  void Equals() {model_.Evaluate(); Notify();}
 
   const std::string& expression() const { return model_.expression(); }
   const std::string& result() const { return model_.result(); }
   const std::string& error() const { return model_.error(); }
-
- private:
+private:
   void Notify() {
     if (on_change_) {
       on_change_();
@@ -232,13 +245,19 @@ class CalculatorController {
 };
 
 // ---------------------- View / App wiring -----------------------------------
-int main() {
+int main(int argc, char* argv[]) {
+  FLAGS_log_dir = "./logs";
+  google::InitGoogleLogging(argv[0]);
+  LOG(INFO) << "hello, world";
+
   CalculatorController controller;
+  // 这里为什么只有初始化的时候可以用=, 其他情况下用move也不行
   auto screen = ScreenInteractive::TerminalOutput();
-  controller.OnChange([&] { screen.Post(Event::Custom); });
+  controller.OnChange([&] {screen.Post(Event::Custom);});
 
   auto button_for = [&](const std::string& label) {
     auto action = [&, label] {
+      LOG(INFO) << "label: " << label;
       if (label == "C") {
         controller.Clear();
       } else if (label == "BS") {
@@ -248,31 +267,34 @@ int main() {
       } else if (label == ".") {
         controller.Dot();
       } else if (label == "+" || label == "-" ||
-                 label == "*" || label == "/") {
+        label == "*" || label == "/") {
         controller.Operator(label.front());
       } else {
         controller.Digit(label.front());
       }
     };
 
-    auto option = ButtonOption::Ascii();
-    option.border = true;
-    option.transform = [](Element e) {
-      return e | size(WIDTH, EQUAL, 5) | size(HEIGHT, EQUAL, 3);
+    auto option = ButtonOption::Ascii().Border();
+    auto base_option = option.transform;
+    option.transform = [base_option](const EntryState& state) {
+      Element element = base_option(state);
+      return element | size(ftxui::WIDTH, ftxui::EQUAL, 5)
+        | size(ftxui::HEIGHT, ftxui::EQUAL, 3);
     };
+
     return Button(label, std::move(action), option);
   };
 
   std::vector<std::vector<std::string>> rows = {
-      {"7", "8", "9", "/"},
-      {"4", "5", "6", "*"},
-      {"1", "2", "3", "-"},
-      {"0", ".", "=", "+"},
-      {"C", "BS"},
+    {"7", "8", "9", "/"},
+    {"4", "5", "6", "*"},
+    {"1", "2", "3", "-"},
+    {"0", ".", "=", "+"},
+    {"C", "BS"},
   };
 
   std::vector<Component> horizontal_rows;
-  for (const auto& row : rows) {
+  for (const auto &row : rows) {
     std::vector<Component> buttons;
     for (const auto& label : row) {
       buttons.push_back(button_for(label));
@@ -281,28 +303,31 @@ int main() {
   }
   auto button_grid = Container::Vertical(std::move(horizontal_rows));
 
+  /* 
+    这里为什么要把button_grid作为第一个参数传入, 有什么用吗, 
+    还是单纯只是这个函数的参数列表的要求如此而已
+   */
   auto main_component = Renderer(button_grid, [&] {
-    auto expr_panel =
-        window(text("Expression"),
-               text(controller.expression().empty()
+    auto expr_panel = 
+      window(text("Expression"),
+            text(controller.expression().empty()
                         ? "enter expression..."
-                        : controller.expression()) |
-                   bold);
+                        : controller.expression()) | bold);
 
-    auto status_text = controller.error().empty()
-                           ? text("Result: " + controller.result()) |
-                                 color(Color::Green)
-                           : text("Error: " + controller.error()) |
-                                 color(Color::Red) | bold;
+      auto status_text = controller.error().empty()
+                        ? text("Result: " + controller.result()) |
+                              color(Color::Green)
+                        : text("Error: " + controller.error()) |
+                              color(Color::Red) | bold;
 
-    return vbox({
-               expr_panel,
-               separator(),
-               window(text("Status"), status_text),
-               separator(),
-               button_grid->Render(),
-           }) |
-           border | size(WIDTH, GREATER_THAN, 40);
+      // 这和上面的Container::Vertical相比有什么区别吗?
+      return vbox({
+        expr_panel,
+        separator(),
+        window(text("Status"), status_text),
+        separator(),
+        button_grid->Render(), // 这里为什么要调用一下Render方法
+      }) | border | size(ftxui::WIDTH, ftxui::GREATER_THAN, 40);
   });
 
   screen.Loop(main_component);

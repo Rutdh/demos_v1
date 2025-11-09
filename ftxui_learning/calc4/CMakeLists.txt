@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib)
+find_package(glog CONFIG REQUIRED)
+
 # Plugin manager library
 add_executable(
     calc4
@@ -26,3 +29,5 @@ target_link_libraries(
     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-dom.a
     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-screen.a
 )
+
+target_link_libraries(calc4 PRIVATE glog::glog)
