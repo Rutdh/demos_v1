@@ -5,8 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib)
-find_package(glog CONFIG REQUIRED)
+# set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib/static-debug/ftxui/cmake/ftxui)
+set(ftxui_DIR "/home/gan/demos_v1/lib/static-debug/ftxui/cmake/ftxui")
+# set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib/static-debug/glog/cmake/glog)
+find_package(ftxui CONFIG REQUIRED)
+# find_package(glog CONFIG REQUIRED)
 
 # Plugin manager library
 add_executable(
@@ -22,12 +25,13 @@ target_include_directories(
     ${TOP_DIR}/lib/ftxui/static-debug/include
 )
 
-target_link_libraries(
-    calc4
-    PRIVATE
-    ${TOP_DIR}/lib/ftxui/static-debug/libftxui-component.a
-    ${TOP_DIR}/lib/ftxui/static-debug/libftxui-dom.a
-    ${TOP_DIR}/lib/ftxui/static-debug/libftxui-screen.a
-)
+# target_link_libraries(
+#     calc4
+#     PRIVATE
+#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-component.a
+#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-dom.a
+#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-screen.a
+# )
+target_link_libraries(calc4 PRIVATE ftxui::dom ftxui::screen ftxui::component)
 
 target_link_libraries(calc4 PRIVATE glog::glog)

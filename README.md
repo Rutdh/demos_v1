@@ -7,44 +7,46 @@
 
 对于公共版本来说, 没必要生成 `compile_commands.json`, 用ninja是为了利用其多线程编译特性. 
 但是如果想阅读三方库的源码, 那么 `compile_commands.json` 就是必须的了,  
-所以还是在cmake的构建阶段加上`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` 这条命令吧  
-注意如果是研究源码使用的话, 尽量不install, 避免lib体积膨胀太快, 当然如果是定制版本, install也行
+所以还是在cmake的构建阶段加上`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` 这条命令吧, build放在源码目录即可   
+注意如果是研究源码使用的话, 尽量不install, 避免lib体积膨胀太快, 当然如果是个性化修改版本有必要的话, install也行
+
+下面给出三方库的通用编译命令
 ``` cmake
 # 静态 Debug
-cmake -S thirdparty/googletest -B build/gtest-static-debug -G Ninja \
+cmake -S thirdparty/ftxui -B build/ftxui-static-debug -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/gtest-static-debug
-cmake --install build/gtest-static-debug --prefix lib/gtest/static-debug
+cmake --build build/ftxui-static-debug
+cmake --install build/ftxui-static-debug --prefix lib/static-debug/ftxui
 
 # 静态 Release
-cmake -S thirdparty/googletest -B build/gtest-static-release -G Ninja \
+cmake -S thirdparty/ftxui -B build/ftxui-static-release -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/gtest-static-release
-cmake --install build/gtest-static-release --prefix lib/gtest/static-release
+cmake --build build/ftxui-static-release
+cmake --install build/ftxui-static-release --prefix lib/static-release/ftxui
 
 # 动态 Debug
-cmake -S thirdparty/googletest -B build/gtest-shared-debug -G Ninja \
+cmake -S thirdparty/ftxui -B build/ftxui-shared-debug -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/gtest-shared-debug
-cmake --install build/gtest-shared-debug --prefix lib/gtest/shared-debug
+cmake --build build/ftxui-shared-debug
+cmake --install build/ftxui-shared-debug --prefix lib/shared-debug/ftxui
 
 # 动态 Release
-cmake -S thirdparty/googletest -B build/gtest-shared-release -G Ninja \
+cmake -S thirdparty/ftxui -B build/ftxui-shared-release -G Ninja \
       -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/gtest-shared-release
-cmake --install build/gtest-shared-release --prefix lib/gtest/shared-release
+cmake --build build/ftxui-shared-release
+cmake --install build/ftxui-shared-release --prefix lib/shared-release/ftxui
 ```
 
 
@@ -103,8 +105,9 @@ CompileFlags:
 目前的解决方案是搞一个compile.sh脚本, 这个脚本会在build层级目录下面创建一个指向当前活跃配置的compile_commands.json的软链接.
 
 ### 编译脚本 compile.sh脚本
-主要用于封装编译命令, 让人手动执行的部分更少, 同时编译提示, 报错和输入信息量反而更多.  
-这个脚本和CMakePresets.json都在顶层存在模板
+~~主要用于封装编译命令, 让人手动执行的部分更少, 同时编译提示, 报错和输入信息量反而更多.  
+这个脚本和CMakePresets.json都在顶层存在模板~~  
+已经废弃, 可能在老项目里面会存在, 目前迁移到compile.py
 
 ### 单个源文件一键编译配置
 在项目根目录下面的.vscode里面的tasks.json里面进行了相关配置, 注意需要依赖CodeLLDB插件 
