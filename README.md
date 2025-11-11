@@ -104,7 +104,7 @@ CompileFlags:
 
 ### 编译脚本 compile.sh脚本
 主要用于封装编译命令, 让人手动执行的部分更少, 同时编译提示, 报错和输入信息量反而更多.  
-这个脚本和CMakePresets.json都在
+这个脚本和CMakePresets.json都在顶层存在模板
 
 ### 单个源文件一键编译配置
 在项目根目录下面的.vscode里面的tasks.json里面进行了相关配置, 注意需要依赖CodeLLDB插件 
