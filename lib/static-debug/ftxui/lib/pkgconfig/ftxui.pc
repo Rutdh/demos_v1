@@ -1,0 +1,9 @@
+prefix="/home/ganjun/demos_v1/lib/static-debug/ftxui"
+libdir="/home/ganjun/demos_v1/lib/static-debug/ftxui/lib"
+includedir="/home/ganjun/demos_v1/lib/static-debug/ftxui/include"
+
+Name: ftxui
+Description: C++ Functional Terminal User Interface.
+Version: 6.1.9
+Cflags: -I${includedir}
+Libs: -L${libdir} -lftxui-component -lftxui-dom -lftxui-screen

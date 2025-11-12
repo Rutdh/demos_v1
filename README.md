@@ -15,38 +15,11 @@
 # 静态 Debug
 cmake -S thirdparty/ftxui -B build/ftxui-static-debug -G Ninja \
       -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Debug \
-      -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
+      -DCMAKE_INSTALL_PREFIX=/home/ganjun/demos_v1/lib/static-debug/ftxui \
       -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build/ftxui-static-debug
-cmake --install build/ftxui-static-debug --prefix lib/static-debug/ftxui
-
-# 静态 Release
-cmake -S thirdparty/ftxui -B build/ftxui-static-release -G Ninja \
-      -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/ftxui-static-release
-cmake --install build/ftxui-static-release --prefix lib/static-release/ftxui
-
-# 动态 Debug
-cmake -S thirdparty/ftxui -B build/ftxui-shared-debug -G Ninja \
-      -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug \
-      -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/ftxui-shared-debug
-cmake --install build/ftxui-shared-debug --prefix lib/shared-debug/ftxui
-
-# 动态 Release
-cmake -S thirdparty/ftxui -B build/ftxui-shared-release -G Ninja \
-      -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_LIBDIR=. -DCMAKE_INSTALL_INCLUDEDIR=include \
-      -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build/ftxui-shared-release
-cmake --install build/ftxui-shared-release --prefix lib/shared-release/ftxui
+cmake --install build/ftxui-static-debug
 ```
 
 

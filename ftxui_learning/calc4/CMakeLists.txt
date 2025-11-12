@@ -6,10 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib/static-debug/ftxui/cmake/ftxui)
-set(ftxui_DIR "/home/gan/demos_v1/lib/static-debug/ftxui/cmake/ftxui")
-# set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib/static-debug/glog/cmake/glog)
+set(ftxui_DIR "/home/ganjun/demos_v1/lib/static-debug/ftxui/lib/cmake/ftxui")
+set(glog_DIR "/home/ganjun/demos_v1/lib/static-debug/glog/lib/cmake/glog")
+
 find_package(ftxui CONFIG REQUIRED)
-# find_package(glog CONFIG REQUIRED)
+find_package(glog CONFIG REQUIRED)
 
 # Plugin manager library
 add_executable(
