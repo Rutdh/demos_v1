@@ -7,10 +7,22 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # set(CMAKE_PREFIX_PATH ${TOP_DIR}/lib/static-debug/ftxui/cmake/ftxui)
 # set(ftxui_DIR "/home/ganjun/demos_v1/lib/static-debug/ftxui/lib/cmake/ftxui")
-# set(glog_DIR "/home/ganjun/demos_v1/lib/static-debug/glog/lib/cmake/glog")
-list(APPEND CMAKE_PREFIX_PATH "/home/ganjun/demos_v1/lib/static-debug/ftxui")
-list(APPEND CMAKE_PREFIX_PATH "/home/ganjun/demos_v1/lib/static-debug/glog")
+# list(APPEND CMAKE_PREFIX_PATH "/home/ganjun/demos_v1/lib/static-debug/glog")
 
+set(
+    glog_DIR
+    "/home/ganjun/demos_v1/lib/static-debug/glog/lib/cmake/glog"
+    CACHE PATH "Custom glog package location" FORCE
+)
+set(
+    gflags_DIR
+    "/home/ganjun/demos_v1/lib/static-debug/gflags/lib/cmake/gflags"
+    CACHE PATH "Custom gflags package location" FORCE
+)
+list(APPEND CMAKE_PREFIX_PATH "/home/ganjun/demos_v1/lib/static-debug/ftxui")
+
+set(GFLAGS_USE_TARGET_NAMESPACE ON)
+find_package(gflags CONFIG REQUIRED)
 find_package(ftxui CONFIG REQUIRED)
 find_package(glog CONFIG REQUIRED)
 
@@ -18,23 +30,13 @@ find_package(glog CONFIG REQUIRED)
 add_executable(
     calc4
     main.cpp
-    calc4.cpp
-    ui.cpp
+    CalcModel.cpp
 )
 
-target_include_directories(
-    calc4
-    PRIVATE
-    ${TOP_DIR}/lib/ftxui/static-debug/include
+target_link_libraries(calc4 PRIVATE 
+    gflags::gflags
+    ftxui::dom 
+    ftxui::screen 
+    ftxui::component
+    glog::glog
 )
-
-# target_link_libraries(
-#     calc4
-#     PRIVATE
-#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-component.a
-#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-dom.a
-#     ${TOP_DIR}/lib/ftxui/static-debug/libftxui-screen.a
-# )
-target_link_libraries(calc4 PRIVATE ftxui::dom ftxui::screen ftxui::component)
-
-target_link_libraries(calc4 PRIVATE glog::glog)

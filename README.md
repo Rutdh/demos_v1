@@ -1,3 +1,5 @@
+https://github.com/Rutdh/demos_v1.git
+
 ## 三方库
 在demos_v1中, 每个项目作为一个基本单位, 都会通过git进行管理[^1], 因此, github就是唯一合适的远程代码托管平台.  
 三方库作为一个项目, 自然也受到了此约定的束缚, 但是和其他项目不同, 三方库还要供给demos_v1下面的多个子项目使用,  
@@ -8,7 +10,7 @@
 对于公共版本来说, 没必要生成 `compile_commands.json`, 用ninja是为了利用其多线程编译特性. 
 但是如果想阅读三方库的源码, 那么 `compile_commands.json` 就是必须的了,  
 所以还是在cmake的构建阶段加上`-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` 这条命令吧, build放在源码目录即可   
-注意如果是研究源码使用的话, 尽量不install, 避免lib体积膨胀太快, 当然如果是个性化修改版本有必要的话, install也行
+注意如果是学习源码使用的话, 尽量不install, 避免lib体积膨胀太快, 当然如果是个性化修改版本有必要的话, install也行
 
 下面给出三方库的通用编译命令
 ``` cmake
