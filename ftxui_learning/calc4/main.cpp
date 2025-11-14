@@ -136,16 +136,14 @@ public:
     }
   }
 
-  const std::string& expression() const {return expression_;}
-  const std::string& result() const {return result_;}
-  const std::string& error() const {return error_;}
-  const std::vector<HistoryEntry>& history() const { return history_; }
+  const std::string &expression() const { return expression_; }
+  const std::string &result() const { return result_; }
+  const std::string &error() const { return error_; }
+  const std::vector<HistoryEntry> &history() const { return history_; }
 
-  void ClearHistory() {
-    history_.clear();
-  }
+  void ClearHistory() { history_.clear(); }
 
-  void SetExpression(const std::string& expr) {
+  void SetExpression(const std::string &expr) {
     expression_ = expr;
     error_.clear();
   }
@@ -167,21 +165,21 @@ private:
     return false;
   }
 
-  static bool EvaluateExpression(const std::string& expr, double& out) {
+  static bool EvaluateExpression(const std::string &expr, double &out) {
     auto precedence = [](char op) {
       switch (op) {
-        case '+':
-        case '-':
-          return 1;
-        case '*':
-        case '/':
-          return 2;
-        default:
-          return 0;
+      case '+':
+      case '-':
+        return 1;
+      case '*':
+      case '/':
+        return 2;
+      default:
+        return 0;
       }
     };
 
-    auto apply = [](std::vector<double>& values, std::vector<char>& ops) {
+    auto apply = [](std::vector<double> &values, std::vector<char> &ops) {
       if (values.size() < 2 || ops.empty()) {
         return false;
       }
@@ -197,16 +195,23 @@ private:
 
       double res = 0.0;
       switch (op) {
-        case '+': res = a + b; break;
-        case '-': res = a - b; break;
-        case '*': res = a * b; break;
-        case '/':
-          if (b == 0.0) {
-            return false;
-          }
-          res = a / b;
-          break;
-        default: return false;
+      case '+':
+        res = a + b;
+        break;
+      case '-':
+        res = a - b;
+        break;
+      case '*':
+        res = a * b;
+        break;
+      case '/':
+        if (b == 0.0) {
+          return false;
+        }
+        res = a / b;
+        break;
+      default:
+        return false;
       }
       values.push_back(res);
       return true;
@@ -309,8 +314,9 @@ private:
     out = values.back();
     return true;
   }
+
 private:
-  void PushHistoryEntry(const std::string& expr, const std::string& result) {
+  void PushHistoryEntry(const std::string &expr, const std::string &result) {
     history_.push_back({expr, result});
     if (history_.size() > kMaxHistoryEntries) {
       history_.erase(history_.begin());
@@ -341,24 +347,49 @@ private:
 class CalculatorController {
 public:
   explicit CalculatorController(CalculatorModel model = {})
-    : model_(std::move(model)) {}
+      : model_(std::move(model)) {}
 
-  void OnChange(std::function<void()> cb) {
-    on_change_ = std::move(cb);
+  void OnChange(std::function<void()> cb) { on_change_ = std::move(cb); }
+
+  void Digit(char digit) {
+    model_.AppendDigit(digit);
+    Notify();
+  }
+  void Operator(char op) {
+    model_.AppendOperator(op);
+    Notify();
+  }
+  void Dot() {
+    model_.AppendDot();
+    Notify();
+  }
+  void LeftParen() {
+    model_.AppendLeftParen();
+    Notify();
+  }
+  void RightParen() {
+    model_.AppendRightParen();
+    Notify();
+  }
+  void Clear() {
+    model_.Clear();
+    Notify();
+  }
+  void Backspace() {
+    model_.Backspace();
+    Notify();
+  }
+  void Equals() {
+    model_.Evaluate();
+    Notify();
+  }
+  void ClearHistory() {
+    model_.ClearHistory();
+    Notify();
   }
 
-  void Digit(char digit) {model_.AppendDigit(digit); Notify();}
-  void Operator(char op) {model_.AppendOperator(op); Notify();}
-  void Dot() {model_.AppendDot(); Notify();}
-  void LeftParen() {model_.AppendLeftParen(); Notify();}
-  void RightParen() {model_.AppendRightParen(); Notify();}
-  void Clear() {model_.Clear(); Notify();}
-  void Backspace() {model_.Backspace(); Notify();}
-  void Equals() {model_.Evaluate(); Notify();}
-  void ClearHistory() {model_.ClearHistory(); Notify();}
-
   void LoadHistoryEntry(size_t index) {
-    const auto& history = model_.history();
+    const auto &history = model_.history();
     if (index >= history.size()) {
       return;
     }
@@ -366,10 +397,11 @@ public:
     Notify();
   }
 
-  const std::string& expression() const { return model_.expression(); }
-  const std::string& result() const { return model_.result(); }
-  const std::string& error() const { return model_.error(); }
-  const std::vector<HistoryEntry>& History() const { return model_.history(); }
+  const std::string &expression() const { return model_.expression(); }
+  const std::string &result() const { return model_.result(); }
+  const std::string &error() const { return model_.error(); }
+  const std::vector<HistoryEntry> &History() const { return model_.history(); }
+
 private:
   void Notify() {
     if (on_change_) {
@@ -382,7 +414,7 @@ private:
 };
 
 // ---------------------- View / App wiring -----------------------------------
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   FLAGS_log_dir = "./logs";
   google::InitGoogleLogging(argv[0]);
   LOG(INFO) << "hello, world";
@@ -390,9 +422,9 @@ int main(int argc, char* argv[]) {
   CalculatorController controller;
   // 这里为什么只有初始化的时候可以用=, 其他情况下用move也不行
   auto screen = ScreenInteractive::TerminalOutput();
-  controller.OnChange([&] {screen.Post(Event::Custom);});
+  controller.OnChange([&] { screen.Post(Event::Custom); });
 
-  auto button_for = [&](const std::string& label) {
+  auto button_for = [&](const std::string &label) {
     auto action = [&, label] {
       LOG(INFO) << "label: " << label;
       if (label == "C") {
@@ -407,8 +439,7 @@ int main(int argc, char* argv[]) {
         controller.RightParen();
       } else if (label == ".") {
         controller.Dot();
-      } else if (label == "+" || label == "-" ||
-        label == "*" || label == "/") {
+      } else if (label == "+" || label == "-" || label == "*" || label == "/") {
         controller.Operator(label.front());
       } else {
         controller.Digit(label.front());
@@ -417,27 +448,24 @@ int main(int argc, char* argv[]) {
 
     auto option = ButtonOption::Ascii().Border();
     auto base_option = option.transform;
-    option.transform = [base_option](const EntryState& state) {
+    option.transform = [base_option](const EntryState &state) {
       Element element = base_option(state);
-      return element | size(ftxui::WIDTH, ftxui::EQUAL, 5)
-        | size(ftxui::HEIGHT, ftxui::EQUAL, 3);
+      return element | size(ftxui::WIDTH, ftxui::EQUAL, 5) |
+             size(ftxui::HEIGHT, ftxui::EQUAL, 3);
     };
 
     return Button(label, std::move(action), option);
   };
 
   std::vector<std::vector<std::string>> rows = {
-    {"C", "(", ")", "BS"},
-    {"7", "8", "9", "/"},
-    {"4", "5", "6", "*"},
-    {"1", "2", "3", "-"},
-    {"0", ".", "=", "+"},
+      {"C", "(", ")", "BS"}, {"7", "8", "9", "/"}, {"4", "5", "6", "*"},
+      {"1", "2", "3", "-"},  {"0", ".", "=", "+"},
   };
 
   std::vector<Component> horizontal_rows;
   for (const auto &row : rows) {
     std::vector<Component> buttons;
-    for (const auto& label : row) {
+    for (const auto &label : row) {
       buttons.push_back(button_for(label));
     }
     horizontal_rows.push_back(Container::Horizontal(std::move(buttons)));
@@ -453,62 +481,56 @@ int main(int argc, char* argv[]) {
       controller.LoadHistoryEntry(static_cast<size_t>(history_selected));
     }
   };
-  auto history_menu = Menu(&history_labels, &history_selected,
-                           history_menu_option);
+  auto history_menu =
+      Menu(&history_labels, &history_selected, history_menu_option);
   auto clear_history_button =
       Button("Clear History", [&] { controller.ClearHistory(); });
   auto history_container =
       Container::Vertical({history_menu, clear_history_button});
 
-  auto root_container =
-      Container::Vertical({button_grid, history_container});
+  auto root_container = Container::Vertical({button_grid, history_container});
 
-  /* 
-    这里为什么要把button_grid作为第一个参数传入, 有什么用吗, 
+  /*
+    这里为什么要把button_grid作为第一个参数传入, 有什么用吗,
     还是单纯只是这个函数的参数列表的要求如此而已
    */
   auto main_component = Renderer(root_container, [&] {
     history_labels.clear();
-    for (const auto& entry : controller.History()) {
+    for (const auto &entry : controller.History()) {
       history_labels.push_back(entry.expression + " = " + entry.result);
     }
     if (!history_labels.empty()) {
       history_selected = std::clamp(
-          history_selected, 0,
-          static_cast<int>(history_labels.size()) - 1);
+          history_selected, 0, static_cast<int>(history_labels.size()) - 1);
     } else {
       history_selected = 0;
     }
 
-    auto expr_panel = 
-      window(text("Expression"),
-            text(controller.expression().empty()
-                        ? "enter expression..."
-                        : controller.expression()) | bold);
+    auto expr_panel =
+        window(text("Expression"),
+               text(controller.expression().empty() 
+                  ? "enter expression..."
+                  : controller.expression()) | bold);
 
-      auto status_text = controller.error().empty()
-                        ? text("Result: " + controller.result()) |
-                              color(Color::Green)
-                        : text("Error: " + controller.error()) |
-                              color(Color::Red) | bold;
+    auto status_text =
+        controller.error().empty()
+            ? text("Result: " + controller.result()) | color(Color::Green)
+            : text("Error: " + controller.error()) | color(Color::Red) | bold;
 
-      Element history_body = history_labels.empty()
-                                 ? text("no history yet") | dim
-                                 : history_menu->Render() | frame |
-                                       size(ftxui::HEIGHT, ftxui::LESS_THAN, 8) |
-                                       vscroll_indicator;
-      auto history_panel = window(text("History"), history_body);
+    Element history_body = history_labels.empty()
+                               ? text("no history yet") | dim
+                               : history_menu->Render() | frame |
+                                     size(ftxui::HEIGHT, ftxui::LESS_THAN, 8) |
+                                     vscroll_indicator;
+    auto history_panel = window(text("History"), history_body);
 
-      return vbox({
-        expr_panel,
-        separator(),
-        window(text("Status"), status_text),
-        separator(),
-        history_panel,
-        clear_history_button->Render(),
-        separator(),
-        button_grid->Render(), // 这里为什么要调用一下Render方法
-      }) | border | size(ftxui::WIDTH, ftxui::GREATER_THAN, 40);
+    return vbox({
+               expr_panel, separator(), window(text("Status"), status_text),
+               separator(), history_panel, clear_history_button->Render(),
+               separator(),
+               button_grid->Render(), // 这里为什么要调用一下Render方法
+           }) |
+           border | size(ftxui::WIDTH, ftxui::GREATER_THAN, 40);
   });
 
   screen.Loop(main_component);
