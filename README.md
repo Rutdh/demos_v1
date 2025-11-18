@@ -40,7 +40,7 @@ git submodule add https://github.com/google/googletest.git thirdparty/googletest
 ```
 git submodule update --init --recursive
 ```
-注意上面的添加子模块命令里面, 目标路径要是不存在的, 不是空的而是不存在的, 并且git会在目标路径下面clone子模块的代码,  
+注意上面的添加子模块命令里面, 目标路径要求是不存在的, 然后git会在目标路径下面clone子模块的代码,  
 但是不会带上子模块名字, 所以目标路径最后一层应该是子模块名字或者其他合适的名字.  
 这点很容易踩坑, 所以记录一下怎么删除添加到错误路径的子模块的方法.
 ``` txt
